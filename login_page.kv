@@ -1,0 +1,74 @@
+Screen:
+    name: 'login_screen'
+    MDBoxLayout:
+        orientation: 'vertical'
+        md_bg_color: 0.17647058823529413, 0.17647058823529413, 0.17647058823529413, 1
+        padding: dp(10)
+        Image:
+            source: './assets/ktunlogo.png'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: dp(20)
+
+            MDLabel:
+                text: 'Kullanıcı Girişi'
+                bold: True
+                font_name: 'assets/font/rubik.ttf'
+                halign: 'center'
+                font_style: 'H4'
+                color: 1, 1, 1, 1
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: dp(5)
+
+            MDTextField:
+                id: username
+                line_color_focus: "white"
+                fill_color_normal: 0.17647058823529413, 0.17647058823529413, 0.17647058823529413, .5
+                hint_text: 'Kullanıcı Adı'
+                hint_text_color_normal: "white"
+                icon_right_color_focus: "white"
+                icon_right_color_normal: "gray"
+                text_color_focus: "white"
+                mode: "round"
+                icon_right: 'account'
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: dp(1)
+
+            MDTextField:
+                id: password
+                line_color_focus: "white"
+                fill_color_normal: 0.17647058823529413, 0.17647058823529413, 0.17647058823529413, .5
+                hint_text: 'Şifre'
+                hint_text_color_normal: "white"
+                icon_right_color_focus: "white"
+                icon_right_color_normal: "gray"
+                text_color_focus: "white"
+                mode: "round"
+                icon_right: 'lock'
+                password: True
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                MDCheckbox:
+                    color_active: "white"
+                    size_hint: None, None
+                    size: "48dp", "48dp"
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    on_active: app.on_checkbox_active(*args)
+                MDLabel:
+                    text: 'Beni hatırla'
+                    color: 1, 1, 1, 1
+
+            MDRoundFlatButton:
+                text_color: "white"
+                line_color: "white"
+                text: 'Giriş Yap'
+                size_hint: None, None
+                size: dp(120), dp(50)
+                pos_hint: {'center_x': 0.5}
+                on_release: app.login(True)

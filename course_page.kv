@@ -1,0 +1,12 @@
+Screen:
+    name: 'course_screen'
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDTopAppBar:
+            md_bg_color: (181 / 255, 37 / 255, 37 / 255, 1)
+            id: course_top_app_bar
+            title: "İçerik"
+            left_action_items: [["pan-left", lambda x: app.go_back()]]
+        MDScrollView:
+            MDList:
+                id: course_content_list
