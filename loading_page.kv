@@ -1,30 +1,44 @@
 Screen:
     name: 'loading_screen'
-    MDGridLayout:
-        canvas.before:
-            PushMatrix
-            Rotate:
-                angle: self.angle
-                origin: self.center
-        canvas.after:
-            PopMatrix
     MDFloatLayout:
-        md_bg_color: 1, 1, 1, 1
-        GridLayout:
-            id: loading
-            angle: 0
-            rows: 2
+        md_bg_color: (181 / 255, 37 / 255, 37 / 255, 1)
+        MDGridLayout:
             cols: 2
-            size_hint: None, None
-            height: 60
-            width: 68
+            rows: 1
             pos_hint: {"center_x": .5, "center_y": .5}
+            size_hint: None, None
+            size: self.parent.width / 2, 500
             spacing: 5
-            MDFloatLayout:
-                md_bg_color: rgba(242, 80, 34,255)
-            MDFloatLayout:
-                md_bg_color: rgba(127, 186, 0, 255)
-            MDFloatLayout:
-                md_bg_color: rgba(0, 164, 239, 255)
-            MDFloatLayout:
-                md_bg_color: rgba(255, 185, 0, 255)
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 1
+                Image:
+                    id: logo
+                    opacity: 0
+                    source: './assets/ktunlogo.png'
+                    size_hint_y: None
+                    height: self.parent.height
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: 2, 1
+                MDLabel:
+                    opacity: 0
+                    id: name
+                    text: 'Konya Teknik\nÜniversitesi'
+                    bold: True
+                    font_name: 'assets/font/standard.ttf'
+                    font_size: 50
+                    halign: 'center'
+                    color: 1, 1, 1, 1
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint: None, None
+            height: 150
+            width: self.parent.width
+            MDLabel:
+                text: 'Uzaktan Öğretim Giriş Sistemi'
+                bold: True
+                font_name: 'assets/font/standard.ttf'
+                font_size: 25
+                halign: 'center'
+                color: 1, 1, 1, 1

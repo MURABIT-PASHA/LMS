@@ -2,7 +2,7 @@ import threading
 
 from kivy import Logger, LOG_LEVELS
 from kivy.animation import Animation
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.lang import Builder
 from kivy.properties import ColorProperty
 from kivy.uix.screenmanager import ScreenManager
@@ -74,6 +74,7 @@ class KTUNApp(MDApp):
         self.username = None
         self.password = None
         self.is_logged_in = False
+        self.set_screen_thread = threading.Thread(target=self.set_screen)
 
     def build(self):
         self.theme_cls.theme_style = "Dark"
@@ -87,18 +88,18 @@ class KTUNApp(MDApp):
         if not self.is_logged_in:
             self.animate_loading()
 
+    @mainthread
     def animate_loading(self):
-        anim = Animation(height=80, width=80, spacing=(10, 10), duration=0.5)
-        anim += Animation(height=60, width=60, spacing=[5, 5], duration=0.5)
-        anim += Animation(angle=self.angle, duration=0.5)
-        anim.bind(on_complete=self.check_anim_status)
-        anim.start(self.root.get_screen('loading_screen').ids.loading)
-        self.angle += 45
+        fade_anim = Animation(opacity=1, duration=1)
+        fade_anim.bind(on_complete=self.check_anim_status)
+        fade_anim.start(self.root.get_screen('loading_screen').ids.logo)
+        Clock.schedule_once(lambda dt: fade_anim.start(self.root.get_screen('loading_screen').ids.name), 2)
 
     def initialize_app(self):
         self.screen_manager.current = self.loading_page.name
-        threading.Thread(target=self.animate_loading).start()
-        threading.Thread(target=self.set_screen).start()
+        self.animate_loading()
+        self.set_screen_thread.start()
+
 
     def set_screen(self):
         try:

@@ -2,7 +2,8 @@ import base64
 import io
 import cv2
 from pytesseract import *
-import selenium.common.exceptions
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException, \
+    UnexpectedAlertPresentException, ElementNotInteractableException
 from PIL import Image
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -30,6 +31,7 @@ options.add_experimental_option(
 class LMSDriver:
     def __init__(self):
         self.is_logged_in = False
+        self.login_exception_count = 0
         self.driver = webdriver.Chrome(options=options)
 
     def __process_captcha(self) -> str:
@@ -65,38 +67,48 @@ class LMSDriver:
                     self.login(credentials[0].split(": ")[1], credentials[1].split(": ")[1])
 
     def login(self, username: str, password: str) -> bool:
-        self.driver.get("https://lms.ktun.edu.tr")
-        username_field = self.driver.find_element("xpath", '//*[@id="username"]')
-        username_field.send_keys(username)
+        if self.login_exception_count > 3:
+            return False
+        else:
+            self.driver.get("https://lms.ktun.edu.tr")
+            username_field = self.driver.find_element("xpath", '//*[@id="username"]')
+            username_field.send_keys(username)
 
-        password_field = self.driver.find_element("xpath", '//*[@id="password"]')
-        password_field.send_keys(password)
+            password_field = self.driver.find_element("xpath", '//*[@id="password"]')
+            password_field.send_keys(password)
 
-        try:
-            checkbox1 = self.driver.find_element("xpath", '//*[@id="sozlesme"]')
-            checkbox1.click()
-            checkbox2 = self.driver.find_element("xpath", '//*[@id="sozlesme1"]')
-            checkbox2.click()
+            try:
+                checkbox1 = self.driver.find_element("xpath", '//*[@id="sozlesme"]')
+                checkbox1.click()
+                checkbox2 = self.driver.find_element("xpath", '//*[@id="sozlesme1"]')
+                checkbox2.click()
 
-            captcha_field = self.driver.find_element("xpath", '//*[@id="captchaInput"]')
-            captcha_field.send_keys(self.__process_captcha())
-        except selenium.common.exceptions.NoSuchElementException:
-            pass
-        except selenium.common.exceptions.ElementClickInterceptedException:
+                captcha_field = self.driver.find_element("xpath", '//*[@id="captchaInput"]')
+                captcha_field.send_keys(self.__process_captcha())
+            except NoSuchElementException:
+                self.login_exception_count += 1
+                self.login(username, password)
+            except ElementClickInterceptedException:
+                self.login_exception_count += 1
+                sleep(3)
+                self.login(username, password)
+            except TypeError:
+                self.login_exception_count += 1
+                self.login(username, password)
+            except ElementNotInteractableException:
+                self.login_exception_count += 1
+                self.login(username, password)
+            login_button = self.driver.find_element("xpath", '//*[@id="loginbtn"]')
+            login_button.click()
             sleep(3)
-            self.login(username, password)
-        except TypeError:
-            self.login(username, password)
-        login_button = self.driver.find_element("xpath", '//*[@id="loginbtn"]')
-        login_button.click()
-        sleep(3)
-        try:
-            if self.driver.title == "Kontrol paneli" or self.driver.title == "Kurslarım" or self.driver.title == "Konya Teknik Üniversitesi Uzaktan Eğitim Sistemi":
-                self.is_logged_in = True
-        except selenium.common.exceptions.UnexpectedAlertPresentException:
-            self.login(username, password)
+            try:
+                if self.driver.title == "Kontrol paneli" or self.driver.title == "Kurslarım" or self.driver.title == "Konya Teknik Üniversitesi Uzaktan Eğitim Sistemi":
+                    self.is_logged_in = True
+            except UnexpectedAlertPresentException:
+                self.login_exception_count += 1
+                self.login(username, password)
 
-        return self.is_logged_in
+            return self.is_logged_in
 
     def get_courses_list(self) -> list:
         if self.is_logged_in:
